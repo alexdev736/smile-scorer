@@ -373,7 +373,7 @@ export default function UploadFaceDetector() {
           <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.5rem 0 0 0' }}>Batch Processing Queue</p>
         </div>
         
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
           
           {/* Model Toggle */}
           <div style={{ background: 'var(--glass-bg)', padding: '0.25rem', borderRadius: '9999px', display: 'flex', border: '1px solid var(--glass-border)' }}>

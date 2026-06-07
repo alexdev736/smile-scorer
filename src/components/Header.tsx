@@ -24,13 +24,13 @@ export default function Header() {
   };
 
   return (
-    <header style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="glass-panel">
+    <header style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }} className="glass-panel">
       <Link href="/">
         <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, background: 'linear-gradient(to right, var(--primary), var(--accent))', WebkitBackgroundClip: 'text', color: 'transparent' }}>
           SmileScorer
         </h2>
       </Link>
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <Link href="/history" style={{ textDecoration: 'none', color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
           History
         </Link>
@@ -42,7 +42,7 @@ export default function Header() {
         </Link>
         
         {/* Auth Buttons */}
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem', borderLeft: '1px solid var(--glass-border)', paddingLeft: '1.5rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '1px solid var(--glass-border)', paddingLeft: '1rem', flexWrap: 'wrap' }}>
           {user ? (
             <>
               <span style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{user.displayName || user.email}</span>
