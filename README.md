@@ -49,3 +49,16 @@ To run the automated test suite locally:
 npx playwright install chromium
 npx playwright test
 ```
+
+## Assumptions
+*   **Client-Side AI vs Server-Side AI**: I assumed the priority was a fast, interactive UX without complex backend infrastructure, so I opted to run the `face-api.js` models entirely client-side using WebGL/WebAssembly. This avoids server bottlenecks and privacy concerns (images aren't sent to a third-party API for processing).
+*   **Storage Strategy**: I assumed minimizing cloud billing was preferred for a prototype, so I designed a workaround to compress images into lightweight Base64 strings to store directly alongside the Firestore records rather than provisioning a dedicated Cloud Storage bucket.
+
+## Next Steps
+1.  **Unit & Integration Testing**: Expand testing beyond Playwright E2E tests by adding Jest and React Testing Library for component-level unit tests.
+2.  **Server-Side AI Pipeline**: For a production app handling millions of users, I would move the AI inference off the client device (to save user battery/bandwidth) and into a scalable backend microservice (e.g., Python FastAPI).
+3.  **CI/CD Pipeline**: Integrate GitHub Actions to automatically run the Playwright tests and Zod schema linting on every Pull Request before allowing a merge to `main`.
+
+## What I would do differently with more time
+*   **State Management**: As the application scales, passing props and managing queue state locally in `UploadFaceDetector.tsx` could become unwieldy. With more time, I would implement a state management solution like Zustand or Redux to handle the global processing queue, allowing users to navigate away from the page while their batch uploads finish processing in the background.
+*   **Relational Database**: While Firebase/Firestore is excellent for rapid prototyping, a relational database like PostgreSQL (using Prisma ORM) would be much better suited long-term for complex queries (e.g., calculating average smile scores across demographics or regions).
