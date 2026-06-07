@@ -4,11 +4,10 @@ A full-stack web application built with Next.js that lets users register via Fir
 
 ## Getting Started
 
-You can run this project locally using Node.js or spin it up instantly using Docker.
-
-### Option 1: Docker (Recommended)
-1. Ensure Docker Desktop is installed and running.
-2. Create a `.env.local` file in the root directory and add your Firebase configuration:
+### Option 1: Vercel Cloud (Recommended for Mobile Testing)
+This application is designed to be instantly deployable to Vercel. 
+1. Go to [Vercel](https://vercel.com) and import this GitHub repository.
+2. Under Environment Variables, add your Firebase keys:
     ```env
     NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
@@ -17,41 +16,36 @@ You can run this project locally using Node.js or spin it up instantly using Doc
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
     NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
     ```
+3. Click Deploy! You will receive an `https://` URL that is fully compatible with mobile device camera permissions.
+
+### Option 2: Docker
+1. Ensure Docker Desktop is installed and running.
+2. Create a `.env.local` file in the root directory and add your Firebase configuration (see above).
 3. Run the following command to build and start the container:
     ```bash
     docker-compose up -d --build
     ```
 4. Open [http://localhost:3000](http://localhost:3000).
 
-### Option 2: Local Node.js
-1.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-2.  **Add your Firebase keys** to `.env.local` as shown above.
-3.  **Run the development server**:
-    ```bash
-    npm run dev
-    ```
+### Option 3: Local Node.js
+1. `npm install`
+2. Add your Firebase keys to `.env.local`.
+3. `npm run dev`
 
-## Architecture
+## Architecture & Features
 
-*   **Framework**: Next.js App Router (React 19).
+*   **Framework**: Next.js App Router.
 *   **Authentication**: Live Firebase Authentication integrated for secure user registration, session management, and login state mapping.
-*   **Deployment**: Fully containerized via Docker and `docker-compose` for reproducible production builds.
+*   **Database**: Integrates Firestore to save user scores. Bypasses strict composite indexing by sorting history records client-side.
+*   **Image Storage Bypassing**: Uses a clever client-side compression script to convert uploaded images into lightweight Base64 strings, storing them directly in the Firestore database to completely avoid Firebase Storage billing requirements.
 *   **Live Webcam Detection**: Integrates `face-api.js` for real-time facial feature tracking directly in the browser.
-*   **Styling**: Vanilla CSS (`globals.css`) with a focus on modern aesthetics, glassmorphism, and responsive design.
-*   **Smile Scoring**: A service layer (`src/lib/scorer.ts`) handles the backend processing logic.
-*   **API Routes**: A Next.js route handler processes the `multipart/form-data` uploads and communicates with the scoring service.
+*   **Strict Typing**: Utilizes **Zod** schema validation to strictly enforce data integrity before any score is committed to the database.
+*   **E2E Testing**: Fully configured with Microsoft **Playwright** for automated browser testing (run via `npx playwright test`).
+*   **Deployment**: Fully containerized via Docker and `docker-compose` for reproducible production builds, with native Vercel deployment support.
 
-## Assumptions & Scope
-
-*   The uploaded batch images do not need to be permanently persisted to cloud storage for this demo; they are processed in memory and discarded.
-*   The application prioritizes UX aesthetics and live interactivity (webcam integration).
-
-## Next Steps
-
-1.  **Cloud Storage Integration**: Connect Firebase Storage to securely store user-uploaded images and generate shareable links for their "smile scores" over time.
-2.  **Database Integration**: Sync Firebase Auth with Firestore to store historical scoring data for each user.
-3.  **Enhanced Error Handling & Validation**: Implement Zod for strict request validation (e.g., verifying image sizes, allowed mime types).
-4.  **Comprehensive E2E Testing**: Add Playwright or Cypress to write robust end-to-end tests covering the entire user journey.
+## E2E Testing
+To run the automated test suite locally:
+```bash
+npx playwright install chromium
+npx playwright test
+```
