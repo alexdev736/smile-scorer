@@ -8,10 +8,10 @@ This document serves as the primary technical reference for the Smile Scorer app
 
 The frontend is built using a modern React stack optimized for client-side processing to ensure low latency and high privacy.
 
-*   **Framework**: Next.js 14 (App Router)
-*   **Language**: TypeScript
+*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/)
 *   **Styling**: Vanilla CSS (`globals.css`) using CSS variables for a consistent "glassmorphism" design system.
-*   **AI Engine**: `face-api.js` (loaded client-side)
+*   **AI Engine**: [face-api.js (@vladmandic fork)](https://github.com/vladmandic/face-api) (loaded client-side)
 
 ### Key Frontend Implementations
 
@@ -62,9 +62,10 @@ const base64Thumbnail = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
 
 The "Backend" consists of Firebase/Firestore integrated directly via client-side SDKs, secured by strict Zod schema validation and Firebase Security Rules.
 
-*   **Database**: Firebase Firestore (NoSQL)
-*   **Authentication**: Firebase Auth (Email/Password & Google OAuth)
-*   **Data Validation**: Zod
+*   **Database**: [Firebase Firestore](https://firebase.google.com/docs/firestore) (NoSQL)
+*   **Authentication**: [Firebase Auth](https://firebase.google.com/docs/auth) (Email/Password & Google OAuth)
+*   **Data Validation**: [Zod](https://zod.dev/)
+*   **E2E Testing**: [Playwright](https://playwright.dev/)
 
 ### Key Backend Implementations
 
