@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerUser } from '@/lib/auth';
+import { loginUser } from '@/lib/auth';
 import Link from 'next/link';
 
-export default function Register() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -19,10 +18,10 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await registerUser(email, password, name);
+      await loginUser(email, password);
       router.push('/upload');
     } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
+      setError('Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -31,7 +30,7 @@ export default function Register() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }} className="animate-fade-in">
       <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Create Account</h2>
+        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Welcome Back</h2>
         
         {error && (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.875rem' }}>
@@ -40,18 +39,6 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div>
-            <label htmlFor="name" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.8)' }}>Full Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field" 
-              placeholder="John Doe"
-              required 
-            />
-          </div>
           <div>
             <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.8)' }}>Email Address</label>
             <input 
@@ -73,17 +60,16 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               className="input-field" 
               placeholder="••••••••"
-              minLength={6}
               required 
             />
           </div>
           <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem', width: '100%' }} disabled={loading}>
-            {loading ? 'Creating Account...' : 'Register'}
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
         
         <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)' }}>
-          Already have an account? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Log in here</Link>
+          Don't have an account? <Link href="/register" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Register here</Link>
         </p>
       </div>
     </div>

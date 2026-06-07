@@ -1,39 +1,30 @@
-// Mock database for users
-type User = {
-  id: string;
-  email: string;
-  name: string;
-};
+import { auth } from './firebase';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  updateProfile,
+  signOut as firebaseSignOut
+} from 'firebase/auth';
 
-const users: User[] = [];
-
-// Simulate async network/DB calls
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export async function registerUser(email: string, name: string): Promise<User> {
-  await delay(500);
+export async function registerUser(email: string, password: string, name: string) {
+  // Use real Firebase SDK to create the user
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const user = userCredential.user;
   
-  if (users.find(u => u.email === email)) {
-    throw new Error('User with this email already exists');
-  }
-
-  const newUser: User = {
-    id: Math.random().toString(36).substring(2, 9),
-    email,
-    name
-  };
-  
-  users.push(newUser);
-  return newUser;
-}
-
-export async function loginUser(email: string): Promise<User> {
-  await delay(500);
-  
-  const user = users.find(u => u.email === email);
-  if (!user) {
-    throw new Error('User not found');
+  // Set the user's display name in Firebase profile
+  if (user) {
+    await updateProfile(user, { displayName: name });
   }
   
   return user;
+}
+
+export async function loginUser(email: string, password: string) {
+  // Use real Firebase SDK to sign in
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  return userCredential.user;
+}
+
+export async function logoutUser() {
+  await firebaseSignOut(auth);
 }
