@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import * as faceapi from '@vladmandic/face-api';
+import { auth, db, storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc } from 'firebase/firestore';
+import { ScoreRecordSchema } from '@/lib/schema';
 
 type FaceResult = {
   score: number;
@@ -13,7 +17,7 @@ type QueueItem = {
   id: string;
   file: File;
   preview: string;
-  status: 'pending' | 'processing' | 'done' | 'error';
+  status: 'pending' | 'processing' | 'done' | 'error' | 'saving' | 'saved';
   results?: FaceResult[];
   error?: string;
   imgWidth?: number;
@@ -193,6 +197,54 @@ export default function UploadFaceDetector() {
   const triggerFileInput = () => fileInputRef.current?.click();
   const clearQueue = () => setQueue([]);
 
+  const handleSaveResult = async (item: QueueItem) => {
+    if (!auth.currentUser) {
+      alert("You must be logged in to save results.");
+      return;
+    }
+    if (!item.results || item.results.length === 0) return;
+
+    setQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'saving' } : q));
+
+    try {
+      // Create a small base64 thumbnail to store directly in Firestore (bypassing Firebase Storage billing)
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.src = item.preview;
+      
+      await new Promise((resolve) => { img.onload = resolve; });
+      
+      const MAX_WIDTH = 300;
+      const scaleSize = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scaleSize;
+      
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+      const base64Thumbnail = canvas.toDataURL('image/jpeg', 0.7); // compress to 70% quality
+
+      // Validate with Zod
+      const record = ScoreRecordSchema.parse({
+        userId: auth.currentUser.uid,
+        score: item.results[0].score, // Save the primary face score
+        message: item.results[0].message,
+        imageUrl: base64Thumbnail,
+        timestamp: new Date().toISOString()
+      });
+
+      // Write directly to Firestore Database
+      await addDoc(collection(db, "scores"), record);
+
+      setQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'saved' } : q));
+    } catch (err: any) {
+      console.error("Error saving result:", err);
+      alert(`Failed to save: ${err.message}`);
+      setQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'error', error: err.message } : q));
+    }
+  };
+
   // 4. Render Grid Item
   const renderQueueItem = (item: QueueItem) => (
     <div key={item.id} style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: 'var(--glass-bg)', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="animate-fade-in">
@@ -268,6 +320,42 @@ export default function UploadFaceDetector() {
             </div>
           </div>
         ))}
+        {/* Save Button for Done Status */}
+        {item.status === 'done' && item.results && (
+          <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSaveResult(item);
+              }}
+              style={{
+                padding: '0.5rem 1.5rem',
+                borderRadius: '9999px',
+                background: 'var(--success)',
+                color: 'white',
+                border: 'none',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              Save to History
+            </button>
+          </div>
+        )}
+
+        {/* Overlay for Saved Status */}
+        {item.status === 'saved' && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(16, 185, 129, 0.2)', backdropFilter: 'blur(2px)', borderRadius: '4px', zIndex: 10 }}>
+             <div style={{ textAlign: 'center', background: 'var(--success)', padding: '1rem', borderRadius: '12px', color: 'white', fontWeight: 'bold' }}>
+                ✓ Saved to History
+             </div>
+          </div>
+        )}
+
       </div>
 
       {/* Filename Tag */}

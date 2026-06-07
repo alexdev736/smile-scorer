@@ -31,11 +31,14 @@ export default function Header() {
         </h2>
       </Link>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <Link href="/upload" style={{ fontWeight: '500', color: 'var(--foreground)' }} className="hover:text-primary transition-colors">
+        <Link href="/history" style={{ textDecoration: 'none', color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+          History
+        </Link>
+        <Link href="/upload" style={{ textDecoration: 'none', color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
           Batch Upload
         </Link>
-        <Link href="/webcam" style={{ fontWeight: '500', color: 'var(--foreground)' }} className="hover:text-primary transition-colors">
-          Live Webcam <span style={{ fontSize: '0.65rem', background: 'var(--accent)', color: 'white', padding: '0.1rem 0.3rem', borderRadius: '4px', verticalAlign: 'top', marginLeft: '0.2rem' }}>WIP</span>
+        <Link href="/webcam" style={{ textDecoration: 'none', color: 'white', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Live Webcam <span style={{ background: 'var(--accent)', fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 'bold' }}>WIP</span>
         </Link>
         
         {/* Auth Buttons */}
